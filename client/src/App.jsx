@@ -13,6 +13,30 @@ const App = () => {
       <Route path="/login" element={!user ? <LoginPage /> : <Navigate to="/dashboard" />} />
       <Route path="/register" element={!user ? <RegisterPage /> : <Navigate to="/dashboard" />} />
       <Route path="/dashboard" element={user ? <Dashboard /> : <Navigate to="/login" />} />
+
+      <Route
+        path="/admin/quizzes"
+        element={
+          user && user.role === 'Admin' ? (
+            <div>Admin Quiz Page Placeholder</div>
+          ) : (
+            <Navigate to="/login" />
+          )
+        }
+      />
+
+      <Route
+        path="/quizzes"
+        element={
+          user && user.role === 'User' ? (
+            <div>User Quiz List Placeholder</div>
+          ) : (
+            <Navigate to="/login" />
+          )
+        }
+      />
+
+
       <Route path="*" element={<Navigate to={user ? "/dashboard" : "/login"} />} />
     </Routes>
   );
