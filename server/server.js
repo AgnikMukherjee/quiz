@@ -2,6 +2,9 @@ import express from "express";
 import dotenv from 'dotenv';
 import cors from 'cors';
 import connectDB from "./configs/mongodb.js";
+import authRouter from './routes/auth.js';
+import quizRouter from './routes/quiz.js';
+
 
 dotenv.config();
 const app = express();
@@ -15,10 +18,9 @@ app.get('/', (req, res) => {
     res.send('Hello Eubrics!');
 })
 
+app.use('/api/auth', authRouter);
+app.use('/api/quiz', quizRouter);
 
-// app.use('/api/auth', authRoutes);
-// app.use('/api/quiz', quizRoutes);
-// app.use('/api/chat', chatbotRoutes);
 
 
 const PORT = process.env.PORT || 5000
