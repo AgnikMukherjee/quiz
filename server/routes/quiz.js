@@ -28,6 +28,15 @@ quizRouter.post('/create', authenticate, authorize(['Admin']), async (req, res) 
     }
 });
 
+quizRouter.get('/my-quizzes', authenticate, authorize(['Admin']), async (req, res) => {
+  try {
+    const quizzes = await Quiz.find({ createdBy: req.user.id });
+    res.json(quizzes);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch your quizzes' });
+  }
+});
+
 //(for users)
 quizRouter.get('/all', authenticate, async (req, res) => {
     try {
@@ -207,6 +216,8 @@ quizRouter.post('/generate', authenticate, authorize(['Admin']), async (req, res
     });
   }
 });
+
+
 
 
 
