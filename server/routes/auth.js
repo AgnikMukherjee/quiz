@@ -76,7 +76,7 @@ authRouter.post('/login', async (req, res) => {
     console.log(' Password matched'); //testing
 
     const token = jwt.sign(
-      { id: user._id, role: user.role },
+      { id: user._id, role: user.role, username: user.username},
       process.env.JWT_SECRET || 'test_secret',
       { expiresIn: '1d' }
     );
