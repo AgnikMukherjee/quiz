@@ -4,28 +4,55 @@ import Quiz from '../models/Quiz.js';
 import openai from '../configs/deepseek.js';
 // import openai from '../configs/openai.js'; 
 
+import Attempt from '../models/Attempt.js';
+
 
 
 
 const quizRouter = express.Router();
 
+
+// AI Explanation Route
+quizRouter.post('/ai/explanation', authenticate, async (req, res) => {
+  try {
+    const { prompt } = req.body;
+
+    if (!prompt) {
+      return res.status(400).json({ error: 'Prompt is required' });
+    }
+
+    const aiPrompt = `Explain why the answer is wrong: ${prompt}`;
+
+    const completion = await openai.chat.completions.create({
+      model: 'deepseek/deepseek-r1-0528:free',
+      messages: [{ role: 'user', content: aiPrompt }],
+    });
+
+    const explanation = completion.choices[0].message.content;
+    res.json({ explanation });
+  } catch (err) {
+    console.error('AI Explanation Error:', err);
+    res.status(500).json({ error: 'Failed to get AI explanation' });
+  }
+});
+
 // quiz (Admin only)
 quizRouter.post('/create', authenticate, authorize(['Admin']), async (req, res) => {
-    try {
-        const { title, tags, questions } = req.body;
+  try {
+    const { title, tags, questions } = req.body;
 
-        const newQuiz = new Quiz({
-            title,
-            tags,
-            questions,
-            createdBy: req.user.id
-        });
+    const newQuiz = new Quiz({
+      title,
+      tags,
+      questions,
+      createdBy: req.user.id
+    });
 
-        await newQuiz.save();
-        res.status(201).json({ message: 'Quiz created successfully', quiz: newQuiz });
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to create quiz' });
-    }
+    await newQuiz.save();
+    res.status(201).json({ message: 'Quiz created successfully', quiz: newQuiz });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to create quiz' });
+  }
 });
 
 quizRouter.get('/my-quizzes', authenticate, authorize(['Admin']), async (req, res) => {
@@ -37,16 +64,112 @@ quizRouter.get('/my-quizzes', authenticate, authorize(['Admin']), async (req, re
   }
 });
 
-//(for users)
-quizRouter.get('/all', authenticate, async (req, res) => {
-    try {
-        const quizzes = await Quiz.find().select('-questions.options.isCorrect');
-        res.json(quizzes);
-    } catch (err) {
-        res.status(500).json({ error: 'Failed to fetch quizzes' });
-    }
+quizRouter.get('/:quizId/attempts', authenticate, authorize(['Admin']), async (req, res) => {
+  try {
+    const attempts = await Attempt.find({ quiz: req.params.quizId }).populate('user', 'username').lean();;
+    const formatted = attempts.map(a => ({
+      username: a.user?.username || 'N/A',
+      score: a.score,
+      total: a.total,
+      responses: a.responses,
+      attemptedAt: a.createdAt,
+    }));
+
+    res.json({ attempts: formatted });
+  } catch (err) {
+    console.error('Error fetching attempts:', err); //testing
+    res.status(500).json({ error: 'Failed to fetch attempts' });
+  }
 });
 
+//(for users)
+quizRouter.get('/all', authenticate, async (req, res) => {
+  try {
+    const quizzes = await Quiz.find().select('-questions.options.isCorrect');
+
+    const attempts = await Attempt.find({ user: req.user.id }).select('quiz');
+    const attemptedIds = attempts.map((a) => a.quiz.toString());
+
+    res.json({ quizzes, attemptedIds }); // ✅ returns both
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to fetch quizzes' });
+  }
+});
+
+quizRouter.get('/:quizId', authenticate, async (req, res) => {
+  try {
+    const quiz = await Quiz.findById(req.params.quizId).lean();
+
+    if (!quiz) return res.status(404).json({ error: 'Quiz not found' });
+
+    // Remove correct answers before sending to user
+    quiz.questions = quiz.questions.map(q => ({
+      ...q,
+      options: q.options.map(({ text }) => ({ text }))
+    }));
+
+    res.json(quiz);
+  } catch (err) {
+    console.error('Quiz fetch error:', err);
+    res.status(500).json({ error: 'Failed to fetch quiz' });
+  }
+});
+
+
+quizRouter.post('/:quizId/attempt', authenticate, async (req, res) => {
+  try {
+    const { answers } = req.body;
+    const userId = req.user.id;
+    const quizId = req.params.quizId;
+
+    const quiz = await Quiz.findById(quizId);
+    if (!quiz) return res.status(404).json({ error: 'Quiz not found' });
+
+    // Check if user already attempted
+    const already = await Attempt.findOne({ quiz: quizId, user: userId });
+    if (already) {
+      return res.status(400).json({ error: 'You already attempted this quiz.' });
+    }
+
+    let score = 0;
+    const responses = quiz.questions.map((q) => {
+      const userAnswer = answers.find((a) => a.questionId === q._id.toString());
+      const selected = userAnswer?.selectedOption;
+      const correctOption = q.options.find((opt) => opt.isCorrect);
+      const isCorrect = selected === correctOption.text;
+
+      if (isCorrect) score++;
+
+      return {
+        questionId: q._id,
+        selectedOption: selected || '',
+        isCorrect,
+      };
+    });
+
+    const attempt = new Attempt({
+      user: userId,
+      quiz: quizId,
+      answers,
+      score,
+      total: quiz.questions.length,
+      responses,
+    });
+
+    await attempt.save();
+
+    res.status(200).json({
+      message: 'Attempt submitted',
+      score,
+      total: quiz.questions.length,
+      responses,
+    });
+  } catch (err) {
+    console.error('Attempt error:', err);
+    res.status(500).json({ error: 'Failed to submit attempt' });
+  }
+});
 
 
 //  open ai assist for admins with OpenAI credits
@@ -98,7 +221,7 @@ quizRouter.get('/all', authenticate, async (req, res) => {
 // });
 
 
-        
+
 
 // Fallback AI Assist for development without OpenAI credits
 // quizRouter.post('/ai-assist', authenticate, authorize(['Admin']), async (req, res) => {
@@ -165,16 +288,16 @@ quizRouter.post('/generate', authenticate, authorize(['Admin']), async (req, res
 
 
     const response = await openai.chat.completions.create({
-      model: 'deepseek/deepseek-r1-0528:free', 
+      model: 'deepseek/deepseek-r1-0528:free',
       messages: [{ role: 'user', content: prompt }],
-    //   response_format:'json' ,
+      //   response_format:'json' ,
     });
     console.log("AI Test:", response.choices[0].message.content); //testing
 
 
     const content = response.choices[0].message.content;
     let questions;
-    
+
     try {
       questions = JSON.parse(content);
       if (!Array.isArray(questions)) {
@@ -186,7 +309,7 @@ quizRouter.post('/generate', authenticate, authorize(['Admin']), async (req, res
       throw new Error('AI returned invalid JSON');
     }
 
-    return res.json({ 
+    return res.json({
       success: true,
       questions,
       source: "DeepSeek R1 AI"
@@ -195,7 +318,7 @@ quizRouter.post('/generate', authenticate, authorize(['Admin']), async (req, res
   } catch (error) {
     console.error('AI Generation Failed:', error.message);
     console.error(error);
-    
+
     // Fallback: Mock Data
     const { topic, numQuestions = 5 } = req.body;
 
@@ -209,13 +332,17 @@ quizRouter.post('/generate', authenticate, authorize(['Admin']), async (req, res
       ],
     }));
 
-    res.status(200).json({ 
-      success: false, 
+    res.status(200).json({
+      success: false,
       questions: mockQuestions,
-      warning: "AI Server is busy right now. Used mocked data instead." 
+      warning: "AI Server is busy right now. Used mocked data instead."
     });
   }
 });
+
+
+
+
 
 
 

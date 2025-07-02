@@ -1,13 +1,15 @@
 import { useEffect, useState } from 'react';
 
 export default function AdminQuizList() {
+  const SERVER_URL = import.meta.env.VITE_SERVER_URL;
+
 
     const [quizzes, setQuizzes] = useState([]);
 
     useEffect(() => {
     const fetchQuizzes = async () => {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:5000/api/quiz/my-quizzes', {
+      const res = await fetch(`${SERVER_URL}/api/quiz/my-quizzes`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

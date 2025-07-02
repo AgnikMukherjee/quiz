@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const LoginPage = () => {
+  const SERVER_URL = import.meta.env.VITE_SERVER_URL;
+
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -21,7 +23,7 @@ const LoginPage = () => {
     setError('');
 
     try {
-      const res = await fetch('http://localhost:5000/api/auth/login', {
+      const res = await fetch(`${SERVER_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),

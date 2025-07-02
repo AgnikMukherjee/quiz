@@ -3,6 +3,10 @@ import { useAuth } from './context/AuthContext';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import Dashboard from './pages/Dashboard';
+import CreateQuiz from './components/CreateQuiz';
+import ManageQuizzes from './components/ManageQuizzes';
+import AvailableQuizzes from './pages/AvailableQuizzes';
+import QuizAttemptPage from './pages/QuizAttemptPage';
 
 
 const App = () => {
@@ -15,10 +19,10 @@ const App = () => {
       <Route path="/dashboard" element={user ? <Dashboard /> : <Navigate to="/login" />} />
 
       <Route
-        path="/admin/quizzes"
+        path="/admin/create-quiz"
         element={
           user && user.role === 'Admin' ? (
-            <div>Admin Quiz Page Placeholder</div>
+            <CreateQuiz />
           ) : (
             <Navigate to="/login" />
           )
@@ -26,16 +30,12 @@ const App = () => {
       />
 
       <Route
-        path="/quizzes"
-        element={
-          user && user.role === 'User' ? (
-            <div>User Quiz List Placeholder</div>
-          ) : (
-            <Navigate to="/login" />
-          )
-        }
+        path="/admin/quizzes"
+        element={user?.role === 'Admin' ? <ManageQuizzes /> : <Navigate to="/login" />}
       />
 
+      <Route path="/quizzes" element={<AvailableQuizzes />} />
+      <Route path="/quizzes/:quizId" element={<QuizAttemptPage />} />
 
       <Route path="*" element={<Navigate to={user ? "/dashboard" : "/login"} />} />
     </Routes>

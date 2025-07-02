@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const RegisterPage = () => {
+  const SERVER_URL = import.meta.env.VITE_SERVER_URL;
+
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -23,7 +25,7 @@ const RegisterPage = () => {
     setError('');
 
     try {
-      const res = await fetch('http://localhost:5000/api/auth/register', {
+      const res = await fetch(`${SERVER_URL}/api/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
