@@ -54,4 +54,4 @@ Each folder (client and backend) has its own .env.example. Follow them carefully
 🧠 AI Integration Note
 We use the DeepSeek R1 model via OpenRouter. You need to generate an API key and configure the .env file to use AI quiz generation and answer explanations.
 
-Free to use, no OpenAI key required!
+Free to use , unlimited requests !
