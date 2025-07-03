@@ -1,8 +1,8 @@
 # 🧠 AI-Powered Quiz App (MERN Stack)
 
-This is a full-stack **quiz application** built using the **MERN stack** (MongoDB, Express.js, React, Node.js). It supports **AI-assisted quiz generation**, **role-based access** (Admin & User), and **quiz attempt tracking** with explanations.
+This is a full-stack **quiz application** built using the **MERN stack** (MongoDB, Express.js, React, Node.js). It supports **AI-assisted quiz generation**, **role-based access** (Admin & User), and **quiz attempt tracking** with explanations. More features are coming soon !!!
 
-## 🚀 Features
+## 🚀 Features 
 
 ### 👤 User (Role: `User`)
 - View all available quizzes
