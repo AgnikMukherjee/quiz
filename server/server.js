@@ -12,7 +12,7 @@ await connectDB()
 
 
 app.use(cors({
-  origin: ['http://localhost:5173', 'https://your-frontend-url.com'],
+  origin: ['http://localhost:5173', `${CLIENT_URL}`],
   credentials: true
 }));
 
