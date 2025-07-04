@@ -1,8 +1,8 @@
 # 🧠 AI-Powered Quiz App (MERN Stack)
 
-This is a full-stack **quiz application** built using the **MERN stack** (MongoDB, Express.js, React, Node.js). It supports **AI-assisted quiz generation**, **role-based access** (Admin & User), and **quiz attempt tracking** with explanations.
+This is a full-stack **quiz application** built using the **MERN stack** (MongoDB, Express.js, React, Node.js). It supports **AI-assisted quiz generation**, **role-based access** (Admin & User), and **quiz attempt tracking** with explanations. More features are coming soon !!!
 
-## 🚀 Features
+## 🚀 Features 
 
 ### 👤 User (Role: `User`)
 - View all available quizzes
@@ -54,4 +54,4 @@ Each folder (client and backend) has its own .env.example. Follow them carefully
 🧠 AI Integration Note
 We use the DeepSeek R1 model via OpenRouter. You need to generate an API key and configure the .env file to use AI quiz generation and answer explanations.
 
-Free to use, no OpenAI key required!
+Free to use , unlimited requests !
