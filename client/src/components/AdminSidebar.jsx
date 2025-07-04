@@ -7,10 +7,7 @@ const AdminSidebar = () => {
 
   return (
     <div className="md:w-50 w-20 md:border-r border-b md:border-b-0 border-gray-300 bg-gray-50 min-h-screen">
-      <h2 className="text-2xl font-semibold mb-8 text-gray-800 ">
-        Admin Panel
-      </h2>
-      <ul className="space-y-4">
+      <ul>
         <li>
           <Link
             to="/admin/create-quiz"
