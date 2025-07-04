@@ -24,7 +24,7 @@ const Navbar = () => {
           className="text-sm border border-red-500 rounded px-2 py-1 text-red-500 bg-white hover:bg-red-500 hover:text-white"
           onClick={handleLogout}
         >
-          Logout
+          Log out
         </button>
       </div>
     </nav>
