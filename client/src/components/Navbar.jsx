@@ -14,7 +14,7 @@ const Navbar = () => {
     <nav className="bg-gradient-to-b from-blue-500 to-blue-300 min-h-12 text-white px-4 flex justify-between items-center shadow-md">
       <div className='flex items-center gap-2'>
       <img src={bulb} alt="" className='w-6'/>
-      <h1 className="text-xl font-bold">Quiz</h1>
+      <h1 className="text-xl font-bold">Quizard</h1>
       </div>
       
       <div className="flex items-center gap-4 ">
