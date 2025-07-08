@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const CreateQuiz = () => {
-    const SERVER_URL = import.meta.env.VITE_SERVER_URL;
+  const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
   const { token } = useAuth();
   const navigate = useNavigate();
@@ -130,6 +130,7 @@ const CreateQuiz = () => {
           className="w-full border px-3 py-2 rounded"
           value={tags}
           onChange={(e) => setTags(e.target.value)}
+          placeholder="e.g. tag-1, tag-2 ..."
         />
       </div>
 
@@ -150,6 +151,7 @@ const CreateQuiz = () => {
             value={numQuestions}
             onChange={(e) => setNumQuestions(Number(e.target.value))}
           />
+          {message && <p className="mt-4 text-sm text-blue-600">{message}</p>}
 
           <button
             onClick={handleGenerate}
@@ -213,7 +215,6 @@ const CreateQuiz = () => {
         Save Quiz
       </button>
 
-      {message && <p className="mt-4 text-sm text-blue-600">{message}</p>}
     </div>
   );
 };
