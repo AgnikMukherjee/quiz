@@ -1,21 +1,19 @@
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import Navbar from '../components/Navbar';
+
 import Footer from '../components/Footer';
-import AdminSidebar from '../components/AdminSidebar';
+import CommonSidebar from '../components/CommonSidebar';
+import { Outlet } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const Dashboard = () => {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
 
 
+const { user, logout } = useAuth();
 
   return (
     <div>
-      <Navbar />
+      <main className="text-default min-h-screen bg-white flex">
+        <CommonSidebar />
 
-      <main className='text-default min-h-screen bg-white flex'>
-        {user?.role === 'Admin' ? (<AdminSidebar/>) : ''}
         <div className="min-h-screen w-full flex flex-col items-center justify-center bg-white">
           <div className="bg-white shadow-md rounded p-8 w-full max-w-md text-center">
             <h1 className="text-2xl font-semibold mb-4">
@@ -28,21 +26,18 @@ const Dashboard = () => {
               </div>
             ) : (
               <div>
-                <p className="mb-4 text-gray-700">Explore and take quizzes below!</p>
-                <button
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded mb-2"
-                  onClick={() => navigate('/quizzes')}
-                >
-                  View Quizzes
-                </button>
+                <p className="mb-4 text-gray-700">Start taking quizzes to improve your knowledge ! </p>
               </div>
             )}
 
 
           </div>
         </div>
+        
+        {/* <div className="flex-1 p-6">
+          <Outlet /> 
+        </div> */}
       </main>
-
       <Footer />
     </div>
   );

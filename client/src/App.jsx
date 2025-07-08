@@ -7,12 +7,15 @@ import CreateQuiz from './components/CreateQuiz';
 import ManageQuizzes from './components/ManageQuizzes';
 import AvailableQuizzes from './pages/AvailableQuizzes';
 import QuizAttemptPage from './pages/QuizAttemptPage';
+import Navbar from './components/Navbar';
 
 
 const App = () => {
   const { user } = useAuth();
 
   return (
+    <>
+    <Navbar/>
     <Routes>
       <Route path="/login" element={!user ? <LoginPage /> : <Navigate to="/dashboard" />} />
       <Route path="/register" element={!user ? <RegisterPage /> : <Navigate to="/dashboard" />} />
@@ -34,11 +37,12 @@ const App = () => {
         element={user?.role === 'Admin' ? <ManageQuizzes /> : <Navigate to="/login" />}
       />
 
-      <Route path="/quizzes" element={<AvailableQuizzes />} />
+      <Route path="/quizzes" element={user && user.role === 'User' ?(<AvailableQuizzes />) : (<Navigate to="/login" />)} />
       <Route path="/quizzes/:quizId" element={<QuizAttemptPage />} />
 
       <Route path="*" element={<Navigate to={user ? "/dashboard" : "/login"} />} />
     </Routes>
+    </>
   );
 };
 
