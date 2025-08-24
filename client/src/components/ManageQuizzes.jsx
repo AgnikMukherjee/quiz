@@ -29,6 +29,30 @@ const ManageQuizzes = () => {
         }
     };
 
+    // NEW: Delete quiz handler
+    const handleDelete = async (quizId) => {
+        const confirmDelete = window.confirm("Are you sure you want to delete this quiz?");
+        if (!confirmDelete) return;
+
+        try {
+            const res = await fetch(`${SERVER_URL}/api/quiz/${quizId}`, {
+                method: "DELETE",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (res.ok) {
+                // remove deleted quiz from UI
+                setQuizzes(quizzes.filter((q) => q._id !== quizId));
+            } else {
+                console.error("Failed to delete quiz");
+            }
+        } catch (err) {
+            console.error("Delete failed", err);
+        }
+    };
+
     const handleViewAttempts = async (quizId) => {
         setSelectedQuizId(quizId);
         setMessage('Loading attempts...');
@@ -53,6 +77,13 @@ const ManageQuizzes = () => {
                 <div key={quiz._id} className="border p-4 rounded mb-4">
                     <h3 className="text-xl font-semibold">{quiz.title}</h3>
                     <p className="text-gray-600 mb-2">Tags: {quiz.tags.join(', ')}</p>
+
+                    <button
+                        onClick={() => handleDelete(quiz._id)}
+                        className="text-sm text-red-600 underline mr-4"
+                    >
+                        Delete
+                    </button>
                     <button
                         onClick={() => handleViewAttempts(quiz._id)}
                         className="text-sm text-blue-700 underline"

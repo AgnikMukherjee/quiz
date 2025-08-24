@@ -15,6 +15,7 @@ const quizSchema = new mongoose.Schema({
   tags: [String],
   questions: [questionSchema],
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+   duration: { type: Number, default: 0 } //
 });
 
 export default mongoose.model('Quiz', quizSchema);

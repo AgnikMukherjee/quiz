@@ -39,12 +39,13 @@ quizRouter.post('/ai/explanation', authenticate, async (req, res) => {
 // quiz (Admin only)
 quizRouter.post('/create', authenticate, authorize(['Admin']), async (req, res) => {
   try {
-    const { title, tags, questions } = req.body;
+    const { title, tags, questions, duration } = req.body;
 
     const newQuiz = new Quiz({
       title,
       tags,
       questions,
+      duration,   //
       createdBy: req.user.id
     });
 
@@ -82,6 +83,22 @@ quizRouter.get('/:quizId/attempts', authenticate, authorize(['Admin']), async (r
   }
 });
 
+quizRouter.delete("/:quizId",authenticate, authorize(['Admin']), async (req, res) => {
+  try {
+    const { quizId } = req.params;
+
+    const deletedQuiz = await Quiz.findByIdAndDelete(quizId);
+    if (!deletedQuiz) {
+      return res.status(404).json({ message: "Quiz not found" });
+    }
+
+    res.json({ message: "Quiz deleted successfully" });
+  } catch (err) {
+    console.error("Delete quiz error:", err);
+    res.status(500).json({ message: "Failed to delete quiz" });
+  }
+});
+
 //(for users)
 quizRouter.get('/all', authenticate, async (req, res) => {
   try {
@@ -102,6 +119,17 @@ quizRouter.get('/:quizId', authenticate, async (req, res) => {
     const quiz = await Quiz.findById(req.params.quizId).lean();
 
     if (!quiz) return res.status(404).json({ error: 'Quiz not found' });
+
+    //  UPDATE
+    const attempt = await Attempt.findOne({ quiz: quiz._id, user: req.user.id });
+    if (attempt) {
+      return res.json({
+        alreadyAttempted: true,
+        score: attempt.score,
+        total: attempt.total,
+        responses: attempt.responses,
+      });
+    }
 
     // Remove correct answers before sending to user
     quiz.questions = quiz.questions.map(q => ({

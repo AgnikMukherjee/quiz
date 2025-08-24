@@ -15,6 +15,7 @@ const CreateQuiz = () => {
   const [numQuestions, setNumQuestions] = useState(5);
   const [questions, setQuestions] = useState([]);
   const [message, setMessage] = useState('');
+  const [duration, setDuration] = useState(0); //
 
   const handleGenerate = async () => {
     setMessage('Generating questions...');
@@ -82,6 +83,7 @@ const CreateQuiz = () => {
           title,
           tags: tags.split(',').map((t) => t.trim()),
           questions,
+          duration,
         }),
       });
       const data = await res.json();
@@ -123,6 +125,18 @@ const CreateQuiz = () => {
           onChange={(e) => setTitle(e.target.value)}
         />
       </div>
+
+      <div className="mb-4">
+        <label className="block font-medium mb-1">Quiz Duration (minutes)</label>
+        <input
+          type="number"
+          className="w-full border px-3 py-2 rounded"
+          value={duration}
+          onChange={(e) => setDuration(Number(e.target.value))}
+          placeholder="e.g. 10"
+        />
+      </div>
+
 
       <div className="mb-4">
         <label className="block font-medium mb-1">Tags</label>
